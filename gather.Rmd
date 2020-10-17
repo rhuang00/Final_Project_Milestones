@@ -23,15 +23,47 @@ overall <- read_excel("raw_data/2016_USA_SERBIA_OVERALL.xlsx", 1)
 # US_Players contains the individual data of each player
 # over the course of 5 sets.
 
-US_Players <- read_excel("raw_data/US_PLAYERS_8_18_16.xlsx") 
+US_Players <- read_excel("raw_data/US_PLAYERS_8_18_16.xlsx") %>% 
+  replace(., is.na(.), 0)
 
 # Serbia_Players reads in individual data of players on the
 # Serbian team who played Team USA on 08-18-2016.
-Serbia_Players <- read_excel("raw_data/SERBIA_PLAYERS_8_18_16.xlsx")
+
+Serbia_Players <- read_excel("raw_data/SERBIA_PLAYERS_8_18_16.xlsx") %>% 
+  replace(., is.na(.), 0)
 ```
 
 ```{r}
-US_Players %>% 
-  ggplot(aes(x = ))
+USA_Serves <- US_Players %>% 
+  ggplot(aes(x = Serve_Total, y = (Serve_Total - Serve_Error))) +
+  geom_col(width = 0.5) +
+  labs(title = "Serve Performance of Team USA Players", 
+       x = "Number of Serves",
+       y = "Number of Succesful Serves")
+
+Serbia_Serves <- Serbia_Players %>% 
+  ggplot(aes(x = Serve_Tot, y = Serve_Tot - Serve_Err)) +
+    geom_col(width = 0.5) +
+  labs(title = "Serve Performance of Team Serbia Players", 
+       x = "Number of Serves",
+       y = "Number of Succesful Serves") 
+
+
+```
+
+```{r}
+USA_Attacks <- US_Players %>% 
+  ggplot(aes(x = Attack_Total, y = Attack_Pts)) +
+  geom_col(width = 0.5) +
+  labs(title = "Attack Performance of Team USA Players", 
+       x = "Number of Attacks",
+       y = "Number of Succesful Attacks")
+
+Serbia_Attacks <- Serbia_Players %>% 
+  ggplot(aes(x = Attack_Tot., y = Attack_Pts)) +
+  geom_col(width = 0.5) +
+  labs(title = "Attack Performance of Team Serbia Players", 
+       x = "Number of Attacks",
+       y = "Number of Succesful Attacks")
 ```
 
