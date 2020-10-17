@@ -1,0 +1,37 @@
+---
+title: "gather.Rmd"
+author: "Ruby Huang"
+date: "10/16/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+library(readxl)
+```
+
+```{r}
+# Read in the excel sheet data.
+
+# Overall contains the general breakdown of the entire game, 
+# by scores per set, as well as number of sets won by each team.
+
+overall <- read_excel("raw_data/2016_USA_SERBIA_OVERALL.xlsx", 1) 
+
+# US_Players contains the individual data of each player
+# over the course of 5 sets.
+
+US_Players <- read_excel("raw_data/US_PLAYERS_8_18_16.xlsx") 
+
+# Serbia_Players reads in individual data of players on the
+# Serbian team who played Team USA on 08-18-2016.
+Serbia_Players <- read_excel("raw_data/SERBIA_PLAYERS_8_18_16.xlsx")
+```
+
+```{r}
+US_Players %>% 
+  ggplot(aes(x = ))
+```
+
