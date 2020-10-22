@@ -1,0 +1,13 @@
+name: Milestone_4
+title: Milestone_4
+username:
+account: rubyhuang
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3036295
+bundleId: 3769063
+url: https://rubyhuang.shinyapps.io/Milestone_4/
+when: 1603340680.74789
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: raw_data/2016_USA_SERBIA_OVERALL.xlsx|raw_data/SERBIA_PLAYERS_8_18_16.xlsx

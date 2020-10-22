@@ -9,18 +9,20 @@
 
 library(shiny)
 library(tidyverse)
-library(readr)
 library(readxl)
+library(readr)
 
 
-US_Players
+US_Players <- read_excel("raw_data/US_PLAYERS_8_18_16.xlsx")
 
 ui <- navbarPage(
     "Analysis of Team USA Women's Volleyball's Olympics Performance",
     tabPanel("Models",
              fluidPage(
                  titlePanel("Team USA Players"),
-                     mainPanel(tableOutput("table")))
+                     mainPanel(tableOutput("table"), 
+                               plotOutput("colPlot")),
+                 )
              ),
     tabPanel("Discussion",
              titlePanel("Discussion Title"),
@@ -40,7 +42,18 @@ server <- function(input, output) {
     output$table <- renderTable({
         US_Players %>% 
             group_by(Players) %>% 
-            summarise(Serve_Success = Serve_Total - Serve_Error)
+            summarise(Serve_Success_Rate = Serve_Total - Serve_Error/Serve_Total)
+    })
+    
+    output$colPlot <- renderPlot({
+       ggplot(US_Players, aes(x = Players, 
+                              y = Serve_Total - Serve_Error/Serve_Total))+
+            geom_col(fill = "white", 
+                     data = US_Players,
+                     color = "black") +
+            theme(axis.text.x = element_text(size = 5)) +
+            labs(title = "Serve Success Rate of Team USA Players \nDuring Semifinals Game against Team Serbia",
+                 y = "Success Rate")
     })
 }
 
