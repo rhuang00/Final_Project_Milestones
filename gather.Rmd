@@ -67,3 +67,20 @@ Serbia_Attacks <- Serbia_Players %>%
        y = "Number of Succesful Attacks")
 ```
 
+
+```{r}
+library(tidyverse)
+library(rstanarm)
+library(rsample)
+library(readxl)
+
+Stats <- read_excel("NCAA Statistics.xlsx")
+
+fit_obj <- stan_glm(Aces ~ Cl, 
+                    data = Stats, 
+                    refresh = 0)
+fit_obj %>% 
+  as_tibble()
+
+```
+

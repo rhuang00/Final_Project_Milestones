@@ -1,0 +1,58 @@
+---
+title: "Organization.Rmd"
+author: "Ruby Huang"
+date: "11/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(rstanarm)
+library(rsample)
+library(tidymodels)
+library(readr)
+library(readxl)
+```
+
+# Potentially MoneyBall model?
+# 
+
+
+```{r, aces}
+
+
+
+read_files <- function(file, year){
+  read_excel(file) %>% 
+    mutate(year = year)
+}
+
+# Put all 2020-21 data in a separate panel
+
+DI_Aces_2021 <- read_files("raw_data/Division I/NCAA Aces Per Set 2020-21.xlsx", 2020)
+
+DI_Aces_1920 <- read_files("raw_data/Division I/NCAA Aces Per Set 2019-20.xlsx", 2019)
+
+#DI_Aces_1819 <- read_files("raw_data/Division I/NCAA Aces Per Set 2018-19.xlsx", 2018)
+
+#DI_Aces_1718 <- read_files("raw_data/Division I/NCAA Aces Per Set 2017-18.xlsx", 2017)
+
+DI_Aces_1617 <- read_files("raw_data/Division I/NCAA Aces Per Set 2016-17.xlsx", 2016)
+
+DI_Aces_1516 <- read_files("raw_data/Division I/NCAA Aces Per Set 2015-16.xlsx", 2015)
+
+DI_Aces_1415 <- read_files("raw_data/Division I/NCAA Aces Per Set 2014-15.xlsx", 2014)
+
+DI_Aces_1314 <- read_files("raw_data/Division I/NCAA Aces Per Set 2013-14.xlsx", 2013)
+
+# 2012-2013 is missing.
+
+DI_Aces_1112 <- read_files("raw_data/Division I/NCAA Aces Per Set 2011-12.xlsx", 2011)
+```
+
+
+```{r}
+
+```
+
