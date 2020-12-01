@@ -8,65 +8,99 @@
 #
 
 library(shiny)
+library(shinythemes)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(wordcloud)
+library(lubridate)
+library(ggthemes)
+library(broom)
 library(tidyverse)
-library(readxl)
-library(readr)
-library(rstanarm)
-library(rsample)
+library(DT)
+library(gt)
+library(shinyWidgets)
+library(plotly)
 
 
-Stats <- read_excel("raw_data/NCAA Statistics.xlsx")
+#source("Organization.Rmd")
 
 ui <- navbarPage(
-    "Analysis of NCAA Women's Volleyball's Performance 2016-17",
-    tabPanel("Models",
-             fluidPage(
-                 titlePanel("Aces Rankings"),
-                     mainPanel(plotOutput("ppModel")),
-                 )
+    "Analysis of NCAA Women's Volleyball's Performance \n2011-19",
+    tabPanel(
+      "About",
+     # includeHTML("")
+    ),
+    tabPanel("By Individual Players",
+             tabsetPanel(
+               tabPanel(
+                 "Across the country",
+                 h2("Distribution across the country"),
+                 p("Insert explanations"),
+                 # heat map visual marking where the most 
+                 # top ranked players are
+                 # also do one by conference
+               ),
+               tabPanel(
+                 "Performance throughout time",
+                 h2("Average performance of ranked players\nevery season"),
+                 p("Insert explanations")
+                 # line plot mapping avg performance per skillset
+                 # across time
+               ))),
+    tabPanel("By Teams",
+             tabsetPanel(
+               tabPanel(
+                 "Top Teams in the Nation",
+                 h2("Top ranking teams across the country"),
+                 p("Insert explanations"),
+                 # heat map showing distribution of top teams
+                 # across the country by region/state
+                 # also do one by conferences across the country
+               ),
+               tabPanel(
+                 "Frequency",
+                 h2("Frequency for each team to be ranked"),
+                 p("Insert explanations")
+                 # wordcloud showing frequency of each team to be
+                 # ranked, per skill set -> a wordcloud for 
+                 # every category
+                 # Potentially a measurement of popularity??
+                 # do both first
+               ))),
+    tabPanel("Model", 
+             tabsetPanel(
+             tabPanel(
+               "Individual Players",
+               h2("Individual Players"),
+             p("Insert explanation about regression")
+             # first regression: class year vs performance 
+             # per skill set
+             # second regression: performance over time per
+             # skill set based on region/conference/school
              ),
-    tabPanel("Discussion",
-             titlePanel("Discussion Title"),
-             p("Tour of the modeling choices you made and 
-              an explanation of why you made them")),
-    tabPanel("About", 
-             titlePanel("About"),
-             h3("Project Background and Motivations"),
-             p("Hello, this is a project that analyzes Team USA's performance in Women's Volleyball during the 2016 Olympics.
-               Data is taken from the TeamUSA Volleyball website, and was gathered per game. Not all the data has been gathered
-               and cleaned up yet, but data used for this milestone was taken from the game between Team USA and Serbia for the Semifinals."),
-             h3("About Me"),
-             p("My name is Ruby Huang and I study History & Government. You can reach me at rubyhuang@college.harvard.edu.")))
+             tabPanel(
+               "Teams",
+               h2("Teams"),
+               p("Insert explanation about regression")
+               # potentially a regression on W-L rates ,
+               # likelihood of each school that was ranked to
+               # be ranked again (choose top 25 schools?)
+               # regression of performance over time per skill
+               # set based on regions, potentially divided into
+               # within each conference, and then national 
+               # rankings
+             )
+             )),
+    tabPanel(
+      "Methods",
+     # includeHTML("")
+    ))
+
 
 
 server <- function(input, output) {
-    output$ppModel <- renderPlot({
-      
-      fit_obj <- stan_glm(Aces ~ Cl, 
-                          data = Stats, 
-                          refresh = 0)
-        fit_obj %>% 
-          as_tibble() %>% 
-          select(-sigma) %>% 
-          mutate(Junior = ClJr., Sophomore = ClSo., Senior = ClSr.) %>%
-          pivot_longer(cols = Junior:Senior,
-                       names_to = "Parameter",
-                       values_to = "aces") %>% 
-          ggplot(aes(x = aces, color = Parameter)) +
-          geom_histogram(aes(y = after_stat(count/sum(count))),
-                         alpha = 0.5, 
-                         bins = 100, 
-                         position = "identity") +
-          labs(title = "Posterior Probability Distribution",
-               subtitle = "Average aces per set for\nNCAA Women's Volleyball Players in 2016-17",
-               x = "Average Aces per Set",
-               y = "Probability") +
-          scale_y_continuous(labels = scales::percent_format()) +
-          theme_classic()
-    })
   
 }
-
-
 
 shinyApp(ui = ui, server = server)

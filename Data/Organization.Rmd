@@ -15,44 +15,746 @@ library(readr)
 library(readxl)
 ```
 
-# Potentially MoneyBall model?
-# 
-
-
-```{r, aces}
-
-
+```{r}
+# read in excel sheets
 
 read_files <- function(file, year){
   read_excel(file) %>% 
     mutate(year = year)
 }
+```
 
-# Put all 2020-21 data in a separate panel
+```{r, aces}
 
-DI_Aces_2021 <- read_files("raw_data/Division I/NCAA Aces Per Set 2020-21.xlsx", 2020)
 
-DI_Aces_1920 <- read_files("raw_data/Division I/NCAA Aces Per Set 2019-20.xlsx", 2019)
+Individual_Aces_1920 <- read_files("raw_data/Individual/NCAA Aces Per Set 2019-20.xlsx", 2019)
 
-#DI_Aces_1819 <- read_files("raw_data/Division I/NCAA Aces Per Set 2018-19.xlsx", 2018)
+Individual_Aces_1617 <- read_files("raw_data/Individual/NCAA Aces Per Set 2016-17.xlsx", 2016)
 
-#DI_Aces_1718 <- read_files("raw_data/Division I/NCAA Aces Per Set 2017-18.xlsx", 2017)
+Individual_Aces_1516 <- read_files("raw_data/Individual/NCAA Aces Per Set 2015-16.xlsx", 2015)
 
-DI_Aces_1617 <- read_files("raw_data/Division I/NCAA Aces Per Set 2016-17.xlsx", 2016)
+Individual_Aces_1415 <- read_files("raw_data/Individual/NCAA Aces Per Set 2014-15.xlsx", 2014)
 
-DI_Aces_1516 <- read_files("raw_data/Division I/NCAA Aces Per Set 2015-16.xlsx", 2015)
+Individual_Aces_1314 <- read_files("raw_data/Individual/NCAA Aces Per Set 2013-14.xlsx", 2013)
 
-DI_Aces_1415 <- read_files("raw_data/Division I/NCAA Aces Per Set 2014-15.xlsx", 2014)
+Individual_Aces_1112 <- read_files("raw_data/Individual/NCAA Aces Per Set 2011-12.xlsx", 2011)
 
-DI_Aces_1314 <- read_files("raw_data/Division I/NCAA Aces Per Set 2013-14.xlsx", 2013)
+Team_Aces_1112 <- read_files("raw_data/Team/NCAA Aces Per Set 2011-12.xlsx", 2011)
 
-# 2012-2013 is missing.
+Team_Aces_1314 <- read_files("raw_data/Team/NCAA Aces Per Set 2013-14.xlsx", 2013) %>% 
+  mutate(`W-L` = NA)
 
-DI_Aces_1112 <- read_files("raw_data/Division I/NCAA Aces Per Set 2011-12.xlsx", 2011)
+Team_Aces_1516 <- read_files("raw_data/Team/NCAA Aces Per Set 2015-16.xlsx", 2015)
+
+Team_Aces_1617 <- read_files("raw_data/Team/NCAA Aces Per Set 2016-17.xlsx", 2016)
+
+Team_Aces_1920 <- read_files("raw_data/Team/NCAA Aces Per Set 2019-20.xlsx", 2019)
+```
+
+
+```{r, assists}
+# Read in all assists.
+
+
+Individual_Assists_1112 <- read_files("raw_data/Individual/NCAA Assists Per Set 2011-12.xlsx", 2011)
+
+Individual_Assists_1314 <- read_files("raw_data/Individual/NCAA Assists Per Set 2013-14.xlsx", 2013)
+
+Individual_Assists_1516 <- read_files("raw_data/Individual/NCAA Assists Per Set 2015-16.xlsx", 2015)
+
+Individual_Assists_1617 <- read_files("raw_data/Individual/NCAA Assists Per Set 2016-17.xlsx", 2016)
+
+Individual_Assists_1920 <- read_files("raw_data/Individual/NCAA Assists Per Set 2019-20.xlsx", 2019)
+
+Team_Assists_Set_1920 <- read_files("raw_data/Team/NCAA Assists Per Set 2019-20.xlsx", 2019)
+
+Team_Assists_Set_1617 <- read_files("raw_data/Team/NCAA Assists Per Set 2016-17.xlsx", 2016)
+
+Team_Assists_Set_1516 <- read_files("raw_data/Team/NCAA Assists Per Set 2015-16.xlsx", 2015)
+
+Team_Assists_Set_1314 <- read_files("raw_data/Team/NCAA Assists Per Set 2013-14.xlsx", 2013) %>% 
+  mutate(`W-L` = NA)
+
+Team_Assists_Set_1112 <- read_files("raw_data/Team/NCAA Assists Per Set 2011-12.xlsx", 2011)
+
+Team_Assists_1415 <- read_files("raw_data/Team/NCAA Team Assists 2014-15.xlsx", 2014)
+
+Team_Assists_1516 <- read_files("raw_data/Team/NCAA Team Assists 2015-16.xlsx", 2015)
+
+Team_Assists_1617 <- read_files("raw_data/Team/NCAA Team Assists 2016-17.xlsx", 2016)
+
+Team_Assists_1718 <- read_files("raw_data/Team/NCAA Team Assists 2017-18.xlsx", 2017)
+
+Team_Assists_1920 <- read_files("raw_data/Team/NCAA Team Assists 2019-20.xlsx", 2019)
+```
+
+```{r, attacks }
+
+Individual_Attacks_1516 <- read_files("raw_data/Individual/NCAA Attacks Per Set 2015-16.xlsx", 2015)
+
+Individual_Attacks_1617 <- read_files("raw_data/Individual/NCAA Attacks Per Set 2016-17.xlsx", 2016)
+
+Individual_Attacks_1920 <- read_files("raw_data/Individual/NCAA Attacks Per Set 2019-20.xlsx", 2019)
+
+Team_Attacks_1920 <- read_files("raw_data/Team/NCAA Team Attacks Per Set 2019-20.xlsx", 2019)
+
+Team_Attacks_1617 <- read_files("raw_data/Team/NCAA Team Attacks Per Set 2016-17.xlsx", 2016)
+
+Team_Attacks_1516 <- read_files("raw_data/Team/NCAA Team Attacks Per Set 2015-16.xlsx", 2015)
+```
+
+```{r, blocks}
+
+Individual_Blocks_1112 <- read_files("raw_data/Individual/NCAA Blocks Per Set 2011-12.xlsx", 2011)
+
+Individual_Blocks_1314 <- read_files("raw_data/Individual/NCAA Blocks Per Set 2013-14.xlsx", 2013)
+
+Individual_Blocks_1516 <- read_files("raw_data/Individual/NCAA Blocks Per Set 2015-16.xlsx", 2015)
+
+Individual_Blocks_1617 <- read_files("raw_data/Individual/NCAA Blocks Per Set 2016-17.xlsx", 2016)
+
+Individual_Blocks_1920 <- read_files("raw_data/Individual/NCAA Blocks Per Set 2019-20.xlsx", 2019)
+
+Team_Blocks_1920 <- read_files("raw_data/Team/NCAA Blocks Per Set 2019-20.xlsx", 2019)
+
+Team_Blocks_1617 <- read_files("raw_data/Team/NCAA Blocks Per Set 2016-17.xlsx", 2016)
+
+Team_Blocks_1516 <- read_files("raw_data/Team/NCAA Blocks Per Set 2015-16.xlsx", 2015)
+
+Team_Blocks_1314 <- read_files("raw_data/Team/NCAA Blocks Per Set 2013-14.xlsx", 2013) %>% 
+  mutate(`W-L` = NA)
+
+Team_Blocks_1112 <- read_files("raw_data/Team/NCAA Blocks Per Set 2011-12.xlsx", 2011)
+```
+
+```{r, digs}
+
+Individual_Digs_1112 <- read_files("raw_data/Individual/NCAA Digs Per Set 2011-12.xlsx", 2011)
+
+Individual_Digs_1314 <- read_files("raw_data/Individual/NCAA Digs Per Set 2013-14.xlsx", 2013)
+
+Individual_Digs_1415 <- read_files("raw_data/Individual/NCAA Digs Per Set 2014-15.xlsx", 2014)
+
+Individual_Digs_1516 <- read_files("raw_data/Individual/NCAA Digs Per Set 2015-16.xlsx", 2015)
+
+Individual_Digs_1617 <- read_files("raw_data/Individual/NCAA Digs Per Set 2016-17.xlsx", 2016)
+
+Individual_Digs_1920 <- read_files("raw_data/Individual/NCAA Digs Per Set 2019-20.xlsx", 2019)
+
+Team_Digs_Set_1920 <- read_files("raw_data/Team/NCAA Digs Per Set 2019-20.xlsx", 2019)
+
+Team_Digs_Set_1617 <- read_files("raw_data/Team/NCAA Digs Per Set 2016-17.xlsx", 2016)
+
+Team_Digs_Set_1516 <- read_files("raw_data/Team/NCAA Digs Per Set 2015-16.xlsx", 2015)
+
+Team_Digs_Set_1314 <- read_files("raw_data/Team/NCAA Digs Per Set 2013-14.xlsx", 2013) %>% 
+  mutate(`W-L` = NA)
+
+Team_Digs_Set_1112 <- read_files("raw_data/Team/NCAA Digs Per Set 2011-12.xlsx", 2011)
+```
+
+```{r, Hitting Percentage}
+
+Individual_Hitting_Percentage_1112 <- read_files("raw_data/Individual/NCAA Hitting Percentage 2011-12.xlsx", 2011)
+
+Individual_Hitting_Percentage_1314 <- read_files("raw_data/Individual/NCAA Hitting Percentage 2013-14.xlsx", 2013)
+
+Individual_Hitting_Percentage_1516 <- read_files("raw_data/Individual/NCAA Hitting Percentage 2015-16.xlsx", 2015)
+
+Individual_Hitting_Percentage_1617 <- read_files("raw_data/Individual/NCAA Hitting Percentage 2016-17.xlsx", 2016)
+
+Individual_Hitting_Percentage_1920 <- read_files("raw_data/Individual/NCAA Hitting Percentage 2019-20.xlsx", 2019)
+
+Team_Hitting_Percentage_1920 <- read_files("raw_data/Team/NCAA Hitting Percentage 2019-20.xlsx", 2019)
+
+Team_Hitting_Percentage_1617 <- read_files("raw_data/Team/NCAA Hitting Percentage 2016-17.xlsx", 2016)
+
+Team_Hitting_Percentage_1516 <- read_files("raw_data/Team/NCAA Hitting Percentage 2015-16.xlsx", 2015)
+
+Team_Hitting_Percentage_1314 <- read_files("raw_data/Team/NCAA Hitting Percentage 2013-14.xlsx", 2013) %>% 
+  mutate(`S` = NA,
+         `W-L` = NA)
+
+Team_Hitting_Percentage_1112 <- read_files("raw_data/Team/NCAA Hitting Percentage 2011-12.xlsx", 2011) %>% 
+  mutate(`S` = NA,
+         `W-L` = NA)
+
+Team_Opp_Hitting_Percentage_1415 <- read_files("raw_data/Team/NCAA Opp Hitting Percentage 2014-15.xlsx", 2014) %>% 
+  select(-`W-L`)
+
+Team_Opp_Hitting_Percentage_1516 <- read_files("raw_data/Team/NCAA Opp Hitting Percentage 2015-16.xlsx", 2015)
+
+Team_Opp_Hitting_Percentage_1617 <- read_files("raw_data/Team/NCAA Opp Hitting Percentage 2016-17.xlsx", 2016)
+
+Team_Opp_Hitting_Percentage_1920 <- read_files("raw_data/Team/NCAA Opp Hitting Percentage 2019-20.xlsx", 2019)
+```
+
+```{r, kills}
+
+Individual_Kills_1112 <- read_files("raw_data/Individual/NCAA Kills Per Set 2011-12.xlsx", 2011)
+
+Individual_Kills_1314 <- read_files("raw_data/Individual/NCAA Kills Per Set 2013-14.xlsx", 2013)
+
+Individual_Kills_1516 <- read_files("raw_data/Individual/NCAA Kills Per Set 2015-16.xlsx", 2015)
+
+Individual_Kills_1617 <- read_files("raw_data/Individual/NCAA Kills Per Set 2016-17.xlsx", 2016)
+
+Individual_Kills_1920 <- read_files("raw_data/Individual/NCAA Kills Per Set 2019-20.xlsx", 2019)
+
+Team_Kills_Set_1920 <- read_files("raw_data/Team/NCAA Kills Per Set 2019-20.xlsx", 2019)
+
+Team_Kills_Set_1617 <- read_files("raw_data/Team/NCAA Kills Per Set 2016-17.xlsx", 2016)
+
+Team_Kills_Set_1516 <- read_files("raw_data/Team/NCAA Kills Per Set 2015-16.xlsx", 2015)
+
+Team_Kills_Set_1314 <- read_files("raw_data/Team/NCAA Kills Per Set 2013-14.xlsx", 2013) %>% 
+  mutate(`W-L` = NA)
+
+Team_Kills_Set_1112 <- read_files("raw_data/Team/NCAA Kills Per Set 2011-12.xlsx", 2011)
+
+Team_Kills_1415 <- read_files("raw_data/Team/NCAA Team Kills 2014-15.xlsx", 2014)
+
+Team_Kills_1516 <- read_files("raw_data/Team/NCAA Team Kills 2015-16.xlsx", 2015)
+
+Team_Kills_1617 <- read_files("raw_data/Team/NCAA Team Kills 2016-17.xlsx", 2016)
+
+Team_Kills_1920 <- read_files("raw_data/Team/NCAA Team Kills 2019-20.xlsx", 2019)
+```
+
+```{r, points}
+
+Individual_Points_1516 <- read_files("raw_data/Individual/NCAA Points 2015-16.xlsx", 2015)
+
+Individual_Points_1617 <- read_files("raw_data/Individual/NCAA Points 2016-17.xlsx", 2016)
+
+Individual_Points_1920 <- read_files("raw_data/Individual/NCAA Points 2019-20.xlsx", 2019)
+
+```
+
+```{r, points per set}
+Individual_Points_Per_Set_1112 <- read_files("raw_data/Individual/NCAA Points Per Set 2011-12.xlsx", 2011)
+
+Individual_Points_Per_Set_1314 <- read_files("raw_data/Individual/NCAA Points Per Set 2013-14.xlsx", 2013)
+
+Individual_Points_Per_Set_1516 <- read_files("raw_data/Individual/NCAA Points Per Set 2015-16.xlsx", 2015)
+
+Individual_Points_Per_Set_1617 <- read_files("raw_data/Individual/NCAA Points Per Set 2016-17.xlsx", 2016)
+
+Individual_Points_Per_Set_1920 <- read_files("raw_data/Individual/NCAA Points Per Set 2019-20.xlsx", 2019)
+
+```
+
+```{r, service aces}
+Individual_Service_Aces_1516 <- read_files("raw_data/Individual/NCAA Service Aces 2015-16.xlsx", 2015)
+
+Individual_Service_Aces_1617 <- read_files("raw_data/Individual/NCAA Service Aces 2016-17.xlsx", 2016)
+
+Individual_Service_Aces_1920 <- read_files("raw_data/Individual/NCAA Service Aces 2019-20.xlsx", 2019)
+
+Team_Service_Aces_1920 <- read_files("raw_data/Team/NCAA Team Service Aces 2019-20.xlsx", 2019)
+
+Team_Service_Aces_1617 <- read_files("raw_data/Team/NCAA Team Service Aces 2016-17.xlsx", 2016)
+
+Team_Service_Aces_1516 <- read_files("raw_data/Team/NCAA Team Service Aces 2015-16.xlsx", 2015)
+
+Team_Service_Aces_1415 <- read_files("raw_data/Team/NCAA Team Service Aces 2014-15.xlsx", 2014)
+```
+
+```{r, total assists}
+
+Individual_Total_Assists_1516 <- read_files("raw_data/Individual/NCAA Total Assists 2015-16.xlsx", 2015)
+
+Individual_Total_Assists_1617 <- read_files("raw_data/Individual/NCAA Total Assists 2016-17.xlsx", 2016)
+
+Individual_Total_Assists_1920 <- read_files("raw_data/Individual/NCAA Total Assists 2019-20.xlsx", 2019)
+
+```
+
+```{r, total attacks}
+
+Individual_Total_Attacks_1415 <- read_files("raw_data/Individual/NCAA Total Attacks 2014-15.xlsx", 2014)
+
+Individual_Total_Attacks_1516 <- read_files("raw_data/Individual/NCAA Total Attacks 2015-16.xlsx", 2015)
+
+Individual_Total_Attacks_1617 <- read_files("raw_data/Individual/NCAA Total Attacks 2016-17.xlsx", 2016)
+
+Individual_Total_Attacks_1920 <- read_files("raw_data/Individual/NCAA Total Attacks 2019-20.xlsx", 2019)
+
+Team_Total_Attacks_1920 <- read_files("raw_data/Team/NCAA Team Total Attacks 2019-20.xlsx", 2019)
+
+Team_Total_Attacks_1617 <- read_files("raw_data/Team/NCAA Team Total Attacks 2016-17.xlsx", 2016)
+
+Team_Total_Attacks_1516 <- read_files("raw_data/Team/NCAA Team Total Attacks 2015-16.xlsx", 2015)
+
+Team_Total_Attacks_1415 <- read_files("raw_data/Team/NCAA Team Total Attacks 2014-15.xlsx", 2014) %>% 
+  mutate(`W-L` = NA)
+
+```
+
+```{r, total blocks}
+
+Individual_Total_Blocks_1516 <- read_files("raw_data/Individual/NCAA Total Blocks 2015-16.xlsx", 2015)
+
+Individual_Total_Blocks_1617 <- read_files("raw_data/Individual/NCAA Total Blocks 2016-17.xlsx", 2016)
+
+Individual_Total_Blocks_1920 <- read_files("raw_data/Individual/NCAA Total Blocks 2019-20.xlsx", 2019)
+
+Team_Total_Blocks_1920 <- read_files("raw_data/Team/NCAA Team Total Blocks 2019-20.xlsx", 2019)
+
+Team_Total_Blocks_1718 <- read_files("raw_data/Team/NCAA Team Total Blocks 2017-18.xlsx", 2017)
+
+Team_Total_Blocks_1617 <- read_files("raw_data/Team/NCAA Team Total Blocks 2016-17.xlsx", 2016)
+
+Team_Total_Blocks_1516 <- read_files("raw_data/Team/NCAA Team Total Blocks 2015-16.xlsx", 2015)
+
+Team_Total_Blocks_1415 <- read_files("raw_data/Team/NCAA Team Total Blocks 2014-15.xlsx", 2014)
+```
+
+```{r, total digs}
+
+Individual_Total_Digs_1516 <- read_files("raw_data/Individual/NCAA Total Digs 2015-16.xlsx", 2015)
+
+Individual_Total_Digs_1617 <- read_files("raw_data/Individual/NCAA Total Digs 2016-17.xlsx", 2016)
+
+Individual_Total_Digs_1920 <- read_files("raw_data/Individual/NCAA Total Digs 2019-20.xlsx", 2019)
+
+Team_Digs_1920 <- read_files("raw_data/Team/NCAA Team Digs 2019-20.xlsx", 2019)
+
+Team_Digs_1617 <- read_files("raw_data/Team/NCAA Team Digs 2016-17.xlsx", 2016)
+
+Team_Digs_1516 <- read_files("raw_data/Team/NCAA Team Digs 2015-16.xlsx", 2015)
+
+Team_Digs_1415 <- read_files("raw_data/Team/NCAA Team Digs 2014-15.xlsx", 2014)
+
+```
+
+```{r, total kills}
+
+Individual_Total_Kills_1516 <- read_files("raw_data/Individual/NCAA Total Kills 2015-16.xlsx", 2015)
+
+Individual_Total_Kills_1617 <- read_files("raw_data/Individual/NCAA Total Kills 2016-17.xlsx", 2016)
+
+Individual_Total_Kills_1920 <- read_files("raw_data/Individual/NCAA Total Kills 2019-20.xlsx", 2019)
+```
+
+```{r, team win rates}
+
+Team_Win_Rate_1920 <- read_files("raw_data/Team/NCAA Win Rate 2019-20.xlsx", 2019)
+
+Team_Win_Rate_1617 <- read_files("raw_data/Team/NCAA Win Rate 2016-17.xlsx", 2016)
+
+Team_Win_Rate_1516 <- read_files("raw_data/Team/NCAA Win Rate 2015-16.xlsx", 2015)
+
+Team_Win_Rate_1314 <- read_files("raw_data/Team/NCAA Win Rate 2013-14.xlsx", 2013)
+
+Team_Win_Rate_1112 <- read_files("raw_data/Team/NCAAWin Rate 2011-12.xlsx", 2011)
+```
+
+```{r, echo=FALSE}
+# combining data sheets.
+
+combine <- function(x, y){
+  rbind(x, y) 
+}
+```
+
+
+```{r, echo=FALSE}
+# individual aces
+
+Individual_Aces <- combine(Individual_Aces_1112, Individual_Aces_1314)
+
+Individual_Aces <- combine(Individual_Aces, Individual_Aces_1415)
+
+Individual_Aces <- combine(Individual_Aces, Individual_Aces_1516)
+
+Individual_Aces <- combine(Individual_Aces, Individual_Aces_1617)
+
+Individual_Aces <- combine(Individual_Aces, Individual_Aces_1920)
+```
+
+
+```{r, echo=FALSE}
+
+# individual assists
+
+Individual_Assists<- combine(Individual_Assists_1112, Individual_Assists_1314)
+
+Individual_Assists <- combine(Individual_Assists, Individual_Assists_1516)
+
+Individual_Assists <- combine(Individual_Assists, Individual_Assists_1617)
+
+Individual_Assists <- combine(Individual_Assists, Individual_Assists_1920)
+```
+
+```{r, echo=FALSE}
+
+# individual attacks
+
+Individual_Attacks <- combine(Individual_Attacks_1516, Individual_Attacks_1617)
+
+Individual_Attacks <- combine(Individual_Attacks, Individual_Attacks_1920)
+```
+
+
+```{r, echo=FALSE}
+# individual blocks
+
+Individual_Blocks <- combine(Individual_Blocks_1112, Individual_Blocks_1314)
+
+Individual_Blocks <- combine(Individual_Blocks, Individual_Blocks_1516)
+
+Individual_Blocks <- combine(Individual_Blocks, Individual_Blocks_1617)
+
+Individual_Blocks <- combine(Individual_Blocks, Individual_Blocks_1920)
+```
+
+```{r, echo=FALSE}
+# individual digs
+
+Individual_Digs <- combine(Individual_Digs_1112,
+                           Individual_Digs_1314)
+
+Individual_Digs <- combine(Individual_Digs,
+                           Individual_Digs_1415)
+
+Individual_Digs <- combine(Individual_Digs,
+                           Individual_Digs_1516)
+
+Individual_Digs <- combine(Individual_Digs,
+                           Individual_Digs_1617)
+
+Individual_Digs <- combine(Individual_Digs,
+                           Individual_Digs_1920)
+```
+
+```{r, echo=FALSE}
+
+# individual hitting percentage
+
+Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage_1112,                                  Individual_Hitting_Percentage_1314)
+
+Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage,                                  Individual_Hitting_Percentage_1516)
+
+Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage,                                  Individual_Hitting_Percentage_1617)
+
+Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage,                                  Individual_Hitting_Percentage_1920)
+
+
+
+```
+
+```{r, echo=FALSE}
+# Individual kills
+
+Individual_Kills <- combine(Individual_Kills_1112,
+                            Individual_Kills_1314)
+
+Individual_Kills <- combine(Individual_Kills,
+                            Individual_Kills_1516)
+
+Individual_Kills <- combine(Individual_Kills,
+                            Individual_Kills_1617)
+
+Individual_Kills <- combine(Individual_Kills,
+                            Individual_Kills_1920)
+```
+
+```{r, echo=FALSE}
+# individual points
+
+Individual_Points <- combine(Individual_Points_1516,
+                             Individual_Points_1617)
+
+Individual_Points <- combine(Individual_Points,
+                             Individual_Points_1920)
+
+
+```
+
+```{r, echo=FALSE}
+# individual points per set
+
+Individual_Points_Per_Set <- combine(Individual_Points_Per_Set_1112, Individual_Points_Per_Set_1314)
+
+Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Points_Per_Set_1516)
+
+Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Points_Per_Set_1617)
+
+Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Points_Per_Set_1920)
+```
+
+```{r, echo=FALSE}
+# individual service aces
+
+Individual_Service_Aces <- combine(Individual_Service_Aces_1516, Individual_Service_Aces_1617)
+
+Individual_Service_Aces <- combine(Individual_Service_Aces, Individual_Service_Aces_1920)
+```
+
+```{r, echo=FALSE}
+# individual total assists
+
+Individual_Total_Assists <- combine(Individual_Total_Assists_1516, Individual_Total_Assists_1617)
+
+Individual_Total_Assists <- combine(Individual_Total_Assists, Individual_Total_Assists_1920)
+```
+
+```{r, echo=FALSE}
+# individual total attacks
+
+Individual_Total_Attacks <- combine(Individual_Total_Attacks_1415, Individual_Total_Attacks_1516)
+
+Individual_Total_Attacks <- combine(Individual_Total_Attacks, Individual_Total_Attacks_1617)
+
+Individual_Total_Attacks <- combine(Individual_Total_Attacks, Individual_Total_Attacks_1920)
+```
+
+```{r, echo=FALSE}
+# individual total blocks
+
+Individual_Total_Blocks <- combine(Individual_Total_Blocks_1516, Individual_Total_Blocks_1617)
+
+Individual_Total_Blocks <- combine(Individual_Total_Blocks, Individual_Total_Blocks_1920)
+```
+
+```{r, echo=FALSE}
+# individual total digs
+
+Individual_Total_Digs <- combine(Individual_Total_Digs_1516, Individual_Total_Digs_1617)
+
+Individual_Total_Digs <- combine(Individual_Total_Digs, Individual_Total_Digs_1920)
+```
+
+```{r, echo=FALSE}
+# Individual total kills
+
+Individual_Total_Kills <- combine(Individual_Total_Kills_1516, Individual_Total_Kills_1617)
+
+Individual_Total_Kills <- combine(Individual_Total_Kills, Individual_Total_Kills_1920)
+```
+
+```{r, echo=FALSE}
+# Team aces per set
+
+Team_Aces <- combine(Team_Aces_1112,
+                     Team_Aces_1314)
+
+Team_Aces <- combine(Team_Aces,
+                     Team_Aces_1516)
+
+Team_Aces <- combine(Team_Aces,
+                     Team_Aces_1617)
+
+Team_Aces <- combine(Team_Aces,
+                     Team_Aces_1920)
+```
+
+```{r, echo=FALSE}
+# team assists
+
+Team_Assists <- combine(Team_Assists_1415, Team_Assists_1516)
+
+Team_Assists <- combine(Team_Assists, Team_Assists_1617)
+
+Team_Assists <- combine(Team_Assists, Team_Assists_1920)
+
+# team assists per set
+
+ Team_Assists_Set <- combine(Team_Assists_Set_1112,
+                            Team_Assists_Set_1314)
+
+Team_Assists_Set <- combine(Team_Assists_Set,
+                            Team_Assists_Set_1516)
+
+Team_Assists_Set <- combine(Team_Assists_Set,
+                            Team_Assists_Set_1617)
+
+Team_Assists_Set <- combine(Team_Assists_Set,
+                            Team_Assists_Set_1920)
+```
+
+```{r, echo=FALSE}
+# Team blocks
+
+Team_Blocks <- combine(Team_Blocks_1112,
+                       Team_Blocks_1314)
+
+Team_Blocks <- combine(Team_Blocks,
+                       Team_Blocks_1516)
+
+Team_Blocks <- combine(Team_Blocks,
+                       Team_Blocks_1617)
+
+Team_Blocks <- combine(Team_Blocks,
+                       Team_Blocks_1920)
+
+# team total blocks
+
+Team_Total_Blocks <- combine(Team_Total_Blocks_1415,
+                             Team_Total_Blocks_1516)
+
+Team_Total_Blocks <- combine(Team_Total_Blocks,
+                             Team_Total_Blocks_1617)
+
+Team_Total_Blocks <- combine(Team_Total_Blocks,
+                             Team_Total_Blocks_1718)
+
+Team_Total_Blocks <- combine(Team_Total_Blocks,
+                             Team_Total_Blocks_1920)
+```
+
+```{r, echo=FALSE}
+# team digs
+
+Team_Digs <- combine(Team_Digs_1415, Team_Digs_1516)
+
+Team_Digs <- combine(Team_Digs, Team_Digs_1617)
+
+Team_Digs <- combine(Team_Digs, Team_Digs_1920)
+
+# team digs per set
+
+Team_Digs_Set <- combine(Team_Digs_Set_1112,
+                         Team_Digs_Set_1314)
+
+Team_Digs_Set <- combine(Team_Digs_Set,
+                         Team_Digs_Set_1516)
+
+Team_Digs_Set <- combine(Team_Digs_Set,
+                         Team_Digs_Set_1617)
+
+Team_Digs_Set <- combine(Team_Digs_Set,
+                         Team_Digs_Set_1920)
+
+```
+
+```{r, echo=FALSE}
+# team hitting percentage
+
+Team_Hitting_Percentage <- combine(Team_Hitting_Percentage_1112,                                  Team_Hitting_Percentage_1314)
+
+Team_Hitting_Percentage <- combine(Team_Hitting_Percentage,                                  Team_Hitting_Percentage_1516)
+
+Team_Hitting_Percentage <- combine(Team_Hitting_Percentage,                                  Team_Hitting_Percentage_1617)
+
+Team_Hitting_Percentage <- combine(Team_Hitting_Percentage,                                  Team_Hitting_Percentage_1920)
+
+# team opp hitting percentage
+
+Team_Opp_Hitting_Percentage <- combine(Team_Opp_Hitting_Percentage_1415, Team_Opp_Hitting_Percentage_1516)
+
+Team_Opp_Hitting_Percentage <- combine(Team_Opp_Hitting_Percentage, Team_Opp_Hitting_Percentage_1617)
+
+Team_Opp_Hitting_Percentage <- combine(Team_Opp_Hitting_Percentage, Team_Opp_Hitting_Percentage_1920)
+
+
+```
+
+```{r, echo=FALSE}
+# team kills
+
+Team_Kills <- combine(Team_Kills_1415, Team_Kills_1516)
+
+Team_Kills <- combine(Team_Kills, Team_Kills_1617)
+
+Team_Kills <- combine(Team_Kills, Team_Kills_1920)
+
+# team kills per set
+
+Team_Kills_Set <- combine(Team_Kills_Set_1112,
+                          Team_Kills_Set_1314)
+
+Team_Kills_Set <- combine(Team_Kills_Set,
+                          Team_Kills_Set_1516)
+
+Team_Kills_Set <- combine(Team_Kills_Set,
+                          Team_Kills_Set_1617)
+
+Team_Kills_Set <- combine(Team_Kills_Set,
+                          Team_Kills_Set_1920)
+
+
+```
+
+```{r, echo=FALSE}
+# team service aces
+
+Team_Service_Aces <- combine(Team_Service_Aces_1415,
+                             Team_Service_Aces_1516)
+
+Team_Service_Aces <- combine(Team_Service_Aces,
+                             Team_Service_Aces_1617)
+
+Team_Service_Aces <- combine(Team_Service_Aces,
+                             Team_Service_Aces_1920)
+
+```
+
+```{r, echo=FALSE}
+# team total attacks
+
+Team_Total_Attacks <- combine(Team_Total_Attacks_1415,
+                              Team_Total_Attacks_1516)
+
+Team_Total_Attacks <- combine(Team_Total_Attacks,
+                              Team_Total_Attacks_1617)
+
+Team_Total_Attacks <- combine(Team_Total_Attacks,
+                              Team_Total_Attacks_1920)
+
+```
+
+```{r, echo=FALSE}
+# team total blocks
+
+Team_Total_Blocks <- combine(Team_Total_Blocks_1415,
+                             Team_Total_Blocks_1516)
+
+Team_Total_Blocks <- combine(Team_Total_Blocks,
+                             Team_Total_Blocks_1617)
+
+Team_Total_Blocks <- combine(Team_Total_Blocks,
+                             Team_Total_Blocks_1718)
+
+Team_Total_Blocks <- combine(Team_Total_Blocks,
+                             Team_Total_Blocks_1920)
+```
+
+```{r, echo=FALSE}
+# team win rate
+
+Team_Win_Rate <- combine(Team_Win_Rate_1112,
+                         Team_Win_Rate_1314)
+
+Team_Win_Rate <- combine(Team_Win_Rate,
+                         Team_Win_Rate_1516)
+
+Team_Win_Rate <- combine(Team_Win_Rate,
+                         Team_Win_Rate_1617)
+
+Team_Win_Rate <- combine(Team_Win_Rate,
+                         Team_Win_Rate_1920)
+
+
+```
+
+```{r}
+fit_1 <- lm(Aces ~ Pos + Cl,
+            data = Individual_Aces)
+
+fit_2 <- lm(Kills ~ Pos + Cl,
+            data = Individual_Kills)
+
+summary(fit_2)
 ```
 
 
 ```{r}
+# create RDS file.
 
+# RDS same format as below csv
+
+# write.csv(Team_Win_Rate, "raw_data/Team_Win_Rate.csv") 
 ```
 
