@@ -56,7 +56,7 @@ Team_Aces_1920 <- read_files("raw_data/Team/NCAA Aces Per Set 2019-20.xlsx", 201
 # Read in all assists.
 
 
-Individual_Assists_1112 <- read_files("raw_data/Individual/NCAA Assists Per Set 2011-12.xlsx", 2011)
+Individual_Assists_1112 <- read_files("raw_data/Individual/NCAA Assists Per Set 2011-12.xlsx", 2011) 
 
 Individual_Assists_1314 <- read_files("raw_data/Individual/NCAA Assists Per Set 2013-14.xlsx", 2013)
 
@@ -371,6 +371,12 @@ Individual_Aces <- combine(Individual_Aces, Individual_Aces_1516)
 Individual_Aces <- combine(Individual_Aces, Individual_Aces_1617)
 
 Individual_Aces <- combine(Individual_Aces, Individual_Aces_1920)
+
+# Separating the player's name and the school team 
+# they play for into 2 columns.
+
+Individual_Aces <- Individual_Aces %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 ```
 
 
@@ -385,6 +391,12 @@ Individual_Assists <- combine(Individual_Assists, Individual_Assists_1516)
 Individual_Assists <- combine(Individual_Assists, Individual_Assists_1617)
 
 Individual_Assists <- combine(Individual_Assists, Individual_Assists_1920)
+
+Individual_Assists <- combine(Individual_Assists, Individual_Total_Assists) %>% 
+  unique()
+
+Individual_Assists <- Individual_Assists %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 ```
 
 ```{r, echo=FALSE}
@@ -393,7 +405,14 @@ Individual_Assists <- combine(Individual_Assists, Individual_Assists_1920)
 
 Individual_Attacks <- combine(Individual_Attacks_1516, Individual_Attacks_1617)
 
-Individual_Attacks <- combine(Individual_Attacks, Individual_Attacks_1920)
+Individual_Attacks <- combine(Individual_Attacks, Individual_Attacks_1920) %>% 
+  rename(Total = "Total Attacks")
+
+Individual_Attacks <- combine(Individual_Attacks, Individual_Total_Attacks) %>% 
+  unique()
+
+Individual_Attacks <- Individual_Attacks %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 ```
 
 
@@ -426,6 +445,13 @@ Individual_Digs <- combine(Individual_Digs,
 
 Individual_Digs <- combine(Individual_Digs,
                            Individual_Digs_1920)
+
+Individual_Digs <- combine(Individual_Digs,
+                           Individual_Total_Digs) %>% 
+  unique()
+
+Individual_Digs <- Individual_Digs %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 ```
 
 ```{r, echo=FALSE}
@@ -438,7 +464,10 @@ Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage,         
 
 Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage,                                  Individual_Hitting_Percentage_1617)
 
-Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage,                                  Individual_Hitting_Percentage_1920)
+# Separating player's name and team and conference into two separate columns.
+
+Individual_Hitting_Percentage <- combine(Individual_Hitting_Percentage,                                  Individual_Hitting_Percentage_1920) %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 
 
 
@@ -457,7 +486,15 @@ Individual_Kills <- combine(Individual_Kills,
                             Individual_Kills_1617)
 
 Individual_Kills <- combine(Individual_Kills,
-                            Individual_Kills_1920)
+                            Individual_Kills_1920) %>% 
+  mutate(MP = NA)
+
+Individual_Kills <- combine(Individual_Kills,
+                            Individual_Total_Kills) %>% 
+  unique()
+
+Individual_Kills <- Individual_Kills %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 ```
 
 ```{r, echo=FALSE}
@@ -466,10 +503,24 @@ Individual_Kills <- combine(Individual_Kills,
 Individual_Points <- combine(Individual_Points_1516,
                              Individual_Points_1617)
 
+# Here I am adding columns S (number of sets played) and Per Set
+# (average number of points scored per set by the player)
+# to prepare for a merge of the Per Set and generic data.
+
 Individual_Points <- combine(Individual_Points,
-                             Individual_Points_1920)
+                             Individual_Points_1920) %>% 
+  mutate(S = NA, "Per Set" = NA)
 
+# Here I am merging the two data sets because not all seasons
+# were available for one or the other set, and so by adding
+# columns and merging them I am able to retrieve more data.
 
+Individual_Points <- combine(Individual_Points, Individual_Points_Per_Set) %>% 
+  unique() %>% 
+  
+# Separating player name and team+conference name.
+  
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 ```
 
 ```{r, echo=FALSE}
@@ -481,7 +532,14 @@ Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Point
 
 Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Points_Per_Set_1617)
 
-Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Points_Per_Set_1920)
+# Here I am adding a new column Pts, which equals to the 
+# total number of points the player has scored that season,
+# rounded to the first decimal place.
+# This will prepare the per set data set for a merge with the
+# generic points data set above.
+
+Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Points_Per_Set_1920) %>% 
+  mutate(Pts = round((`Per Set` * S), 1))
 ```
 
 ```{r, echo=FALSE}
@@ -489,7 +547,15 @@ Individual_Points_Per_Set <- combine(Individual_Points_Per_Set, Individual_Point
 
 Individual_Service_Aces <- combine(Individual_Service_Aces_1516, Individual_Service_Aces_1617)
 
-Individual_Service_Aces <- combine(Individual_Service_Aces, Individual_Service_Aces_1920)
+# Here I am adding a column "Per Set" for the average number
+# of service aces the ranked player has per set, and I am
+# rounding to 2 decimal places to match with the Per Set data set.
+
+Individual_Service_Aces <- combine(Individual_Service_Aces, Individual_Service_Aces_1920) %>% 
+  mutate("Per Set" = round(Aces/S, 2)) 
+
+Individual_Service_Aces <- Individual_Service_Aces %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
 ```
 
 ```{r, echo=FALSE}
@@ -497,7 +563,11 @@ Individual_Service_Aces <- combine(Individual_Service_Aces, Individual_Service_A
 
 Individual_Total_Assists <- combine(Individual_Total_Assists_1516, Individual_Total_Assists_1617)
 
-Individual_Total_Assists <- combine(Individual_Total_Assists, Individual_Total_Assists_1920)
+# Here I am adding a column "Per Set" for the average number
+# of assists the ranked player has per set 
+
+Individual_Total_Assists <- combine(Individual_Total_Assists, Individual_Total_Assists_1920) %>% 
+  mutate("Per Set" = round(Assists/S, digits = 2))
 ```
 
 ```{r, echo=FALSE}
@@ -507,7 +577,9 @@ Individual_Total_Attacks <- combine(Individual_Total_Attacks_1415, Individual_To
 
 Individual_Total_Attacks <- combine(Individual_Total_Attacks, Individual_Total_Attacks_1617)
 
-Individual_Total_Attacks <- combine(Individual_Total_Attacks, Individual_Total_Attacks_1920)
+Individual_Total_Attacks <- combine(Individual_Total_Attacks, Individual_Total_Attacks_1920) %>% 
+  rename(Total = "Total Attacks") %>% 
+  mutate("Per Set" = round(Total/S, 2))
 ```
 
 ```{r, echo=FALSE}
@@ -515,7 +587,21 @@ Individual_Total_Attacks <- combine(Individual_Total_Attacks, Individual_Total_A
 
 Individual_Total_Blocks <- combine(Individual_Total_Blocks_1516, Individual_Total_Blocks_1617)
 
-Individual_Total_Blocks <- combine(Individual_Total_Blocks, Individual_Total_Blocks_1920)
+# Here I am adding a column "Per Set" for the average number
+# of blocks the ranked player has per set, and I am
+# rounding to 2 decimal places to match with the Per Set data set.
+
+Individual_Total_Blocks <- combine(Individual_Total_Blocks, Individual_Total_Blocks_1920) %>% 
+  rename("Total" = "Site") %>% 
+  mutate("Per Set" = round(Total/S, digits = 2))
+
+Individual_Blocks <- combine(Individual_Total_Blocks,
+                             Individual_Blocks) %>% 
+  unique() 
+
+Individual_Blocks <- Individual_Blocks %>% 
+  separate(Player, into = c("Player", "Team"), sep = ", ")
+  
 ```
 
 ```{r, echo=FALSE}
@@ -523,7 +609,12 @@ Individual_Total_Blocks <- combine(Individual_Total_Blocks, Individual_Total_Blo
 
 Individual_Total_Digs <- combine(Individual_Total_Digs_1516, Individual_Total_Digs_1617)
 
-Individual_Total_Digs <- combine(Individual_Total_Digs, Individual_Total_Digs_1920)
+# Here I am adding a column "Per Set" for the average number
+# of digs the ranked player has per set, and I am
+# rounding to 2 decimal places to match with the Per Set data set.
+
+Individual_Total_Digs <- combine(Individual_Total_Digs, Individual_Total_Digs_1920) %>% 
+  mutate("Per Set" = round(Digs/S, 2))
 ```
 
 ```{r, echo=FALSE}
@@ -531,7 +622,12 @@ Individual_Total_Digs <- combine(Individual_Total_Digs, Individual_Total_Digs_19
 
 Individual_Total_Kills <- combine(Individual_Total_Kills_1516, Individual_Total_Kills_1617)
 
-Individual_Total_Kills <- combine(Individual_Total_Kills, Individual_Total_Kills_1920)
+# Here I am adding a column "Per Set" for the average number
+# of kills the ranked player has per set, and I am
+# rounding to 2 decimal places to match with the Per Set data set.
+
+Individual_Total_Kills <- combine(Individual_Total_Kills, Individual_Total_Kills_1920) %>% 
+  mutate("Per Set" = round(Kills/S, digits = 2))
 ```
 
 ```{r, echo=FALSE}
@@ -551,13 +647,6 @@ Team_Aces <- combine(Team_Aces,
 ```
 
 ```{r, echo=FALSE}
-# team assists
-
-Team_Assists <- combine(Team_Assists_1415, Team_Assists_1516)
-
-Team_Assists <- combine(Team_Assists, Team_Assists_1617)
-
-Team_Assists <- combine(Team_Assists, Team_Assists_1920)
 
 # team assists per set
 
@@ -572,6 +661,32 @@ Team_Assists_Set <- combine(Team_Assists_Set,
 
 Team_Assists_Set <- combine(Team_Assists_Set,
                             Team_Assists_Set_1920)
+
+# team assists
+
+Team_Assists <- combine(Team_Assists_1415,
+                        Team_Assists_1516)
+
+Team_Assists <- combine(Team_Assists,
+                        Team_Assists_1617)
+
+Team_Assists <- combine(Team_Assists,
+                        Team_Assists_1718)
+
+# I am adding a new column Per Set (average number of assists
+# per set played) to prepare the generic data set for a merge
+# with the specified per set data set.
+
+Team_Assists <- combine(Team_Assists,
+                        Team_Assists_1920) %>% 
+  mutate("Per Set" = round(Assists/S, 2))
+
+# Here I am combining the two to retrieve more data since not
+# all seasons were available for each data set. I am also
+# using unique() to avoid any repetition of data.
+
+Team_Assists <- combine(Team_Assists, Team_Assists_Set) %>% 
+  unique()
 ```
 
 ```{r, echo=FALSE}
@@ -587,7 +702,19 @@ Team_Blocks <- combine(Team_Blocks,
                        Team_Blocks_1617)
 
 Team_Blocks <- combine(Team_Blocks,
-                       Team_Blocks_1920)
+                       Team_Blocks_1920) %>% 
+  
+# Here I am adding a new column Total, which equals the total
+# number of blocks to prepare for a merge with the generic
+# data set.
+  
+  mutate(Total = round(`Per Set`*S, 1))
+
+# Here I am combining the two data sets to retrieve more data,
+# and using unique() to avoid any repeated data points.
+
+Team_Blocks <- combine(Team_Blocks, Team_Total_Blocks) %>% 
+  unique()
 
 # team total blocks
 
@@ -601,7 +728,19 @@ Team_Total_Blocks <- combine(Team_Total_Blocks,
                              Team_Total_Blocks_1718)
 
 Team_Total_Blocks <- combine(Team_Total_Blocks,
-                             Team_Total_Blocks_1920)
+                             Team_Total_Blocks_1920) %>% 
+  
+# Here I am renaming Site to Total as it is meant to be
+# the total number of blocks by each team, but Site is an 
+# unclear name.
+  
+  rename(Total = Site)
+  
+# Here I am adding a new column Per Set to prepare for a merge
+# with the specific per set data set.
+
+  Team_Total_Blocks <- Team_Total_Blocks %>% 
+  mutate("Per Set" = round(Total/S, 2))
 ```
 
 ```{r, echo=FALSE}
@@ -611,7 +750,8 @@ Team_Digs <- combine(Team_Digs_1415, Team_Digs_1516)
 
 Team_Digs <- combine(Team_Digs, Team_Digs_1617)
 
-Team_Digs <- combine(Team_Digs, Team_Digs_1920)
+Team_Digs <- combine(Team_Digs, Team_Digs_1920) %>% 
+  mutate("Per Set" = round(Digs/S, digits = 2))
 
 # team digs per set
 
@@ -627,6 +767,10 @@ Team_Digs_Set <- combine(Team_Digs_Set,
 Team_Digs_Set <- combine(Team_Digs_Set,
                          Team_Digs_Set_1920)
 
+
+Team_Digs_Set <- combine(Team_Digs_Set,
+                         Team_Digs) %>% 
+  unique()
 ```
 
 ```{r, echo=FALSE}
@@ -658,7 +802,20 @@ Team_Kills <- combine(Team_Kills_1415, Team_Kills_1516)
 
 Team_Kills <- combine(Team_Kills, Team_Kills_1617)
 
-Team_Kills <- combine(Team_Kills, Team_Kills_1920)
+# I am adding a new column Per Set (average number of kills
+# per set played) to prepare the generic data set for a merge
+# with the specified per set data set.
+
+Team_Kills <- combine(Team_Kills, Team_Kills_1920) %>% 
+  mutate("Per Set" = round(Kills/S, 2))
+
+
+# Here I am combining the two to retrieve more data since not
+# all seasons were available for each data set. I am also
+# using unique() to avoid any repetition of data.
+
+Team_Kills <- combine(Team_Kills, Team_Kills_Set) %>% 
+  unique()
 
 # team kills per set
 
@@ -700,26 +857,35 @@ Team_Total_Attacks <- combine(Team_Total_Attacks_1415,
 Team_Total_Attacks <- combine(Team_Total_Attacks,
                               Team_Total_Attacks_1617)
 
+# I am adding a new column Per Set (average number of attacks
+# per set played) to prepare the generic data set for a merge
+# with the specified per set data set.
+
+# I am first renaming the column Total Attacks to Total for
+# ease of mutating.
+
 Team_Total_Attacks <- combine(Team_Total_Attacks,
-                              Team_Total_Attacks_1920)
+                              Team_Total_Attacks_1920) %>% 
+  rename(Total = "Total Attacks") %>% 
+  mutate("Per Set" = round(Total/S, 2))
+
+# team attacks
+
+Team_Attacks <- combine(Team_Attacks_1516,
+                        Team_Attacks_1617)
+
+Team_Attacks <- combine(Team_Attacks,
+                        Team_Attacks_1920) %>% 
+  rename(Total = "Total Attacks")
+
+# Here I am combining the two data sets to retrieve more data
+# since not all seasons (years) were available for the data 
+# sets. I am also using unique() for only distinct results.
+
+Team_Attacks <- combine(Team_Attacks, Team_Total_Attacks) %>%  unique()
 
 ```
 
-```{r, echo=FALSE}
-# team total blocks
-
-Team_Total_Blocks <- combine(Team_Total_Blocks_1415,
-                             Team_Total_Blocks_1516)
-
-Team_Total_Blocks <- combine(Team_Total_Blocks,
-                             Team_Total_Blocks_1617)
-
-Team_Total_Blocks <- combine(Team_Total_Blocks,
-                             Team_Total_Blocks_1718)
-
-Team_Total_Blocks <- combine(Team_Total_Blocks,
-                             Team_Total_Blocks_1920)
-```
 
 ```{r, echo=FALSE}
 # team win rate
@@ -753,8 +919,45 @@ summary(fit_2)
 ```{r}
 # create RDS file.
 
-# RDS same format as below csv
 
-# write.csv(Team_Win_Rate, "raw_data/Team_Win_Rate.csv") 
+write_rds(Team_Aces, "raw_data/Team A.rds")
+
+write_rds(Team_Assists, "raw_data/Team AST.rds")
+
+write_rds(Team_Hitting_Percentage, "raw_data/Team Ht Pct.rds")
+
+write_rds(Team_Opp_Hitting_Percentage, "raw_data/Team Opp Ht Pct.rds")
+
+write_rds(Team_Blocks, "raw_data/Team B.rds")
+
+write_rds(Team_Digs_Set, "raw_data/Team D.rds")
+
+write_rds(Team_Service_Aces, "raw_data/Team SA.rds")
+
+write_rds(Team_Win_Rate, "raw_data/Team WR.rds")
+
+write_rds(Team_Kills, "raw_data/Team K.rds")
+
+write_rds(Team_Attacks, "raw_data/Team Att.rds")
+
+write_rds(Individual_Blocks, "raw_data/Individual B.rds")
+
+write_rds(Individual_Assists, "raw_data/Individual AST.rds")
+
+write_rds(Individual_Aces, "raw_data/Individual A.rds")
+
+write_rds(Individual_Kills, "raw_data/Individual K.rds")
+
+write_rds(Individual_Attacks, "raw_data/Individual Att.rds")
+
+write_rds(Individual_Service_Aces, "raw_data/Individual SA.rds")
+
+write_rds(Individual_Digs, "raw_data/Individual D.rds")
+
+write_rds(Individual_Points, "raw_data/Individual Pts.rds")
+
+write_rds(Individual_Hitting_Percentage, "raw_data/Individual Ht Pct.rds")
 ```
+
+
 
