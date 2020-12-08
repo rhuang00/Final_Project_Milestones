@@ -133,7 +133,18 @@ ui <- navbarPage(#tags$head(
     "NCAA Women's Volleyball Performance",
     theme = shinytheme("cerulean"),
     tabPanel("About",
+             
+# Loading in separately-written html page.
+
+
       includeHTML("About.html"),
+
+# Loading css and javascript. I originally has sass too, but
+# the code did not work out, so I had to take them out.
+# The images in html won't load properly on shinyapp, so I removed
+# the images as well. I will try to add them back in later, but
+# the images for the About page are not a top priority at the moment.
+
       includeCSS("www/main.css",
                  "www/fontawesome-all.min.css"),
       includeScript("www/breakpoints.min.js",
@@ -144,12 +155,27 @@ ui <- navbarPage(#tags$head(
                     "www/main.js",
                     "www/util.js")
     ),
+
+# First panel with graphics, used for data sets containing rankings of 
+# individual players. Unfortunately a lot of data was missing (per season),
+# and although I tried to make up for that by calculating some stats using 
+# the guidebook's formulas, I could not make up for the lack of data for an
+# entire year/season.
+
     tabPanel("By Individual Players", 
-                 h2("Performance across the country"),
+             
+                 h2("Performance across the country", align = "center"),
+             
                  p("Here we have graphs displaying the average performance
                    of individually ranked players in every skill category."),
+             
                  sidebarLayout(position = "left",
+                               
                    sidebarPanel(width = 2,
+                                
+# Interactive feature: choose the class year for each graphics to see the average 
+# performance of ranked players in that class year for each year/season.
+
                 selectInput(inputId = "Class",
                                    label = "Select Class:",
                                    choices = c("Sophomore" = "So.", 
@@ -165,6 +191,10 @@ ui <- navbarPage(#tags$head(
                ), 
                mainPanel(
                  fluidRow(
+
+# I played around with the layout and this was the most comfortable visually
+# for now.
+                   
                  column(4,
                            plotOutput(outputId = "plot1"),
                            plotOutput(outputId = "plot2"), 
@@ -182,12 +212,16 @@ ui <- navbarPage(#tags$head(
                
               )),
   
-    
+
+# Second panel with graphics featuring data from the Team ranking data sets.
+
     tabPanel("By Teams",
              
              tabsetPanel(
                tabPanel("Top Teams", 
              sidebarLayout(
+               
+# Instead of class year, the interactive feature is to choose the year/season.
                
                sidebarPanel(width = 2,
                  selectInput(inputId = "Year",
@@ -211,6 +245,10 @@ ui <- navbarPage(#tags$head(
                           ),
                 mainPanel(h4("Top 10 Teams per Category", align = "center"),
                           fluidRow(
+                            
+# There is an odd number of tables, so i ended up creating 4 columns and having
+# the last table be displayed on the first row. 
+                            
                             column(4,
                                    tableOutput(outputId = "table1"),
                                    tableOutput(outputId = "table2"), 
@@ -219,15 +257,20 @@ ui <- navbarPage(#tags$head(
                                    tableOutput(outputId = "table4"),
                                    tableOutput(outputId = "table5"),
                                    tableOutput(outputId = "table6")),
-                            column(3,
+                            column(4,
                                    tableOutput(outputId = "table7"),
                                    tableOutput(outputId = "table8"),
-                                   tableOutput(outputId = "table9"),
+                                   tableOutput(outputId = "table9")),
+                            column(4,
                                    tableOutput(outputId = "table10"))
                           )
                 )
                )
              ),
+
+# Using the same data sets, but filtering for the conference names rather than
+# team names (Which contain the conference they compete in).
+
              tabPanel("Top Conferences",
                       sidebarLayout(
                       sidebarPanel(width = 2,
@@ -260,10 +303,11 @@ ui <- navbarPage(#tags$head(
                                          tableOutput(outputId = "table14"),
                                          tableOutput(outputId = "table15"),
                                          tableOutput(outputId = "table16")),
-                                  column(3,
+                                  column(4,
                                          tableOutput(outputId = "table17"),
                                          tableOutput(outputId = "table18"),
-                                         tableOutput(outputId = "table19"),
+                                         tableOutput(outputId = "table19")),
+                                  column(4,
                                          tableOutput(outputId = "table20"))
                                 )
                       )
@@ -297,9 +341,11 @@ ui <- navbarPage(#tags$head(
              ),
              tabPanel(
                "Teams",
-               "Regression Model 1",
+               h2("Regression Model 1", align = "center"),
                plotOutput("regression"),
-               p("hi")
+              # p("")
+               h2("Regression Model 2", align = "center"),
+               plotOutput("regression3")
                # potentially a regression on W-L rates ,
                # likelihood of each school that was ranked to
                # be ranked again (choose top 25 schools?)
@@ -668,6 +714,19 @@ server <- function(input, output) {
      output$regression2 <- renderPlot(
        {
          ggplotRegression(lm(Pts ~ Pos, I_Pts))
+       }
+     )
+     
+     output$regression <- renderPlot(
+       {
+        
+         ggplotRegression(lm(`Pct.` ~ Kills, T_HP))
+       }
+     )
+     
+     output$regression3 <- renderPlot(
+       {
+         ggplotRegression(lm(`Pct.` ~ Errors, T_HP))
        }
      )
      }
