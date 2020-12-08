@@ -19,8 +19,10 @@ library(DT)
 library(gt)
 library(shinyWidgets)
 library(shinycssloaders)
-library(RColorBrewer)
-library(wordcloud)
+# library(RColorBrewer)
+# library(wordcloud)
+# library(wordcloud2)
+library(htmltools)
 
 # Reading in team ranking data.
 
@@ -46,6 +48,29 @@ I_K <- read_rds("raw_data/Individual K.rds")
 I_Pts <- read_rds("raw_data/Individual Pts.rds")
 I_SA <- read_rds("raw_data/Individual SA.rds")
 I_HP <- read_rds("raw_data/Individual Ht Pct.rds")
+
+# read in win rate for the word cloud
+
+# Digs <- read_rds("raw_data/Digs.rds")
+
+# Assists <- read_rds("raw_data/Ast.rds")
+
+# Attacks <- read_rds("raw_data/Att.rds")
+
+# Aces <- read_rds("raw_data/Aces.rds")
+
+# Kills <- read_rds("raw_data/Kills.rds")
+
+# Blocks <- read_rds("raw_data/Blocks.rds")
+
+# "Hitting Percentage" <- read_rds("raw_data/HP.rds")
+
+# "Opponent Hitting Percentage" <- read_rds( "raw_data/OHP.rds")
+
+# "Win Rate" <- read_rds("raw_data/WR.rds")
+
+# "Service Aces" <- read_rds("raw_data/SA.rds")
+
 
 # Creating a list of the conferences for future use,
 # such as for input selections or the word clouds.
@@ -84,10 +109,27 @@ conference_names <-  c("MEAC",
                        "Independent")
 
 
-
+only_text <- function(file){
+  
+  file %>% 
+    
+    # Here I am separating the team names from the conference names.
+    
+    mutate(conference = strsplit(Team, "[()]")) %>% 
+    
+    # It took me quite a long time to figure out how to
+    # only keep the conference names/team names since
+    # the each row was a list, but after googling examples I figured it out!
+    
+    mutate(conference = lapply(conference,'[[', 2)) %>% 
+    mutate(Team = strsplit(Team, "[()]")) %>% 
+    mutate(Team = lapply(Team, '[[', 1))
+}
   
 
-ui <- navbarPage(
+ui <- navbarPage(#tags$head(
+     #tags$style(
+     # HTML('* {font-family: Garamond};'))),
     "NCAA Women's Volleyball Performance",
     theme = shinytheme("cerulean"),
     tabPanel("About",
@@ -106,23 +148,19 @@ ui <- navbarPage(
                  h2("Performance across the country"),
                  p("Here we have graphs displaying the average performance
                    of individually ranked players in every skill category."),
-                 p("The skill categories are:
-                   Aces: 
-                   Assists:
-                   Attacks:"),
                  sidebarLayout(position = "left",
                    sidebarPanel(width = 2,
                 selectInput(inputId = "Class",
                                    label = "Select Class:",
                                    choices = c("Sophomore" = "So.", 
                                                "Junior" = "Jr.",
-                                               "Senior" = "Sr.")),
-                selectInput(inputId = "ConferenceFinder",
-                             label = "Conference:",
-                             choices = c("School Names", 
-                                         "Conference Names",
-                                         ""),
-                             selected = "All")
+                                               "Senior" = "Sr."))#,
+                #selectInput(inputId = "ConferenceFinder",
+                            # label = "Conference:",
+                            # choices = c("School Names", 
+                                         #"Conference Names",
+                                         #""),
+                            # selected = "All")
                 
                ), 
                mainPanel(
@@ -146,51 +184,93 @@ ui <- navbarPage(
   
     
     tabPanel("By Teams",
+             
              tabsetPanel(
-               tabPanel("Table",
-                 "Top 10 Teams per Category", align = "center",
+               tabPanel("Top Teams", 
              sidebarLayout(
-               sidebarPanel(width = 4,
-                            position = "left",
+               
+               sidebarPanel(width = 2,
                  selectInput(inputId = "Year",
                              label = "Year:",
-                             choices = c(2011:2019)),
-             selectInput("Category",
-                         "Category:",
-                         c("Aces",
-                           "Assists",
-                           "Attacks",
-                           "Blocks",
-                           "Digs",
-                           "Hitting Percentage",
-                           "Kills",
-                           "Opponent Hitting Percentage",
-                           "Service Aces",
-                           "Win Rate",
-                           selected = "Aces"
-                         )
-                         )
+                             choices = c(2011:2019))#,
+            # selectInput("Category",
+                        # "Category:",
+                        # c("Aces",
+                        #   "Assists",
+                         #  "Attacks",
+                         #  "Blocks",
+                          # "Digs",
+                         #  "Hitting Percentage",
+                         #  "Kills",
+                         #  "Opponent Hitting Percentage",
+                         #  "Service Aces",
+                          # "Win Rate",
+                         #  selected = "Aces"
+                         #)
+                         #)
                           ),
-                mainPanel(position = "right",
-                  fluidRow(
-                   column(12,
-                        tableOutput(outputId = "table")
+                mainPanel(h4("Top 10 Teams per Category", align = "center"),
+                          fluidRow(
+                            column(4,
+                                   tableOutput(outputId = "table1"),
+                                   tableOutput(outputId = "table2"), 
+                                   tableOutput(outputId = "table3")),
+                            column(4,
+                                   tableOutput(outputId = "table4"),
+                                   tableOutput(outputId = "table5"),
+                                   tableOutput(outputId = "table6")),
+                            column(3,
+                                   tableOutput(outputId = "table7"),
+                                   tableOutput(outputId = "table8"),
+                                   tableOutput(outputId = "table9"),
+                                   tableOutput(outputId = "table10"))
+                          )
+                )
                )
-             )
-             )
-             )
              ),
-             tabPanel("Word Clouds",
-                      h3("Here are the most often ranked teams or conferences from 2011-2019"),
-                      radioButtons("wordcloud",
-                                  label = "Display:",
-                                  choices = c("Teams", "Conferences")
+             tabPanel("Top Conferences",
+                      sidebarLayout(
+                      sidebarPanel(width = 2,
+                        selectInput(inputId = "Year2",
+                                    label = "Year:",
+                                    choices = c(2011:2019))#,
+                      #selectInput("Category2",
+                                 # "Category:",
+                                 # c("Aces",
+                                 #   "Assists",
+                                 #   "Attacks",
+                                 #   "Blocks",
+                                  #  "Digs",
+                                  #  "Hitting Percentage",
+                                  #  "Kills",
+                                  #  "Opponent Hitting Percentage",
+                                  #  "Service Aces",
+                                  #  "Win Rate",
+                                  #  selected = "Aces"
+                                  #)
+                      #)
                       ),
-                      
-               
+                      mainPanel(h4("Top 10 Conferences per Category", align = "center"),
+                                fluidRow(
+                                  column(4,
+                                         tableOutput(outputId = "table11"),
+                                         tableOutput(outputId = "table12"), 
+                                         tableOutput(outputId = "table13")),
+                                  column(4,
+                                         tableOutput(outputId = "table14"),
+                                         tableOutput(outputId = "table15"),
+                                         tableOutput(outputId = "table16")),
+                                  column(3,
+                                         tableOutput(outputId = "table17"),
+                                         tableOutput(outputId = "table18"),
+                                         tableOutput(outputId = "table19"),
+                                         tableOutput(outputId = "table20"))
+                                )
+                      )
              )
              )
-             ),
+             ))
+             ,
                  
                  # wordcloud showing frequency of each team to be
                  # ranked, per skill set -> a wordcloud for 
@@ -202,17 +282,24 @@ ui <- navbarPage(
              tabsetPanel(
              tabPanel(
                "Individual Players",
-               h2("Individual Players"),
-             p("Insert explanation about regression")
+               h2("Regression Model 1", align = "center"),
+              plotOutput("regression1"),
+              p("This model is a linear regression between the total number of points 
+                scored by top players and the total number of kills they scored."),
+              p("Based on the regression line, we can assume that there is a 
+                positive relationship between kills and overall points scored."),
              # first regression: class year vs performance 
              # per skill set
              # second regression: performance over time per
              # skill set based on region/conference/school
+             h2("Regression Model 2", align = "center"),
+             plotOutput("regression2")
              ),
              tabPanel(
                "Teams",
-               h2("Teams"),
-               p("Insert explanation about regression")
+               "Regression Model 1",
+               plotOutput("regression"),
+               p("hi")
                # potentially a regression on W-L rates ,
                # likelihood of each school that was ranked to
                # be ranked again (choose top 25 schools?)
@@ -221,16 +308,28 @@ ui <- navbarPage(
                # within each conference, and then national 
                # rankings
              )
-             )))
+             ))
+    )
 
 
 
 # regression models
 
-fit_1 <- lm(Aces ~ Cl + Pos,
-            I_A)
+#fit_1 <- lm(Aces ~ Cl + Pos,
+            #I_A)
 
-
+ggplotRegression <- function (fit) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                       "Intercept =",signif(fit$coef[[1]],5 ),
+                       " Slope =",signif(fit$coef[[2]], 5),
+                       " P =",signif(summary(fit)$coef[2,4], 5)))
+}
 
 server <- function(input, output) {
   output$plot1 <- renderPlot(
@@ -355,53 +454,52 @@ server <- function(input, output) {
 # category's top 10 teams for every available year.
     
     
-      output$table <- renderTable(
-        
-# I am embedding if() else() statements to render a table
-# depending on the selected category using the dropdown
-# options.
-        
-      if(input$Category == "Aces")
-      {T_A %>% 
+      output$table1 <- renderTable({
+        T_A %>% 
         filter(year == input$Year) %>%
         mutate(`Aces per Set` = `Per Set`) %>% 
         summarize(Team, `Aces per Set`) %>% 
         slice(1:10)
       }
+      )
       
-     else(if(input$Category == "Assists"){
+     output$table2 <- renderTable({
       T_Ast %>% 
         filter(year == input$Year) %>%
         mutate(`Assists per Set` = `Per Set`) %>% 
         summarize(Team, `Assists per Set`) %>% 
         slice(1:10)
      }
+     )
       
-     else(if(input$Category == "Attacks"){
+     output$table3 <- renderTable({
        T_Att %>% 
          filter(year == input$Year) %>%
          mutate(`Attacks per Set` = `Per Set`) %>% 
          summarize(Team, `Attacks per Set`) %>% 
          slice(1:10)
      }
+     )
      
-     else(if(input$Category == "Blocks"){
+     output$table4 <- renderTable({
        T_B %>% 
          filter(year == input$Year) %>%
          mutate(`Blocks per Set` = `Per Set`) %>% 
          summarize(Team, `Blocks per Set`) %>% 
          slice(1:10)
      }
+     )
      
-     else(if(input$Category == "Digs"){
+     output$table5 <- renderTable({
        T_D %>% 
          filter(year == input$Year) %>%
          mutate(`Digs per Set` = `Per Set`) %>% 
          summarize(Team, `Digs per Set`) %>% 
          slice(1:10)
      }
+     )
      
-     else(if(input$Category == "Hitting Percentage"){
+     output$table6 <- renderTable({
        T_HP %>% 
          filter(year == input$Year) %>%
          
@@ -413,25 +511,27 @@ server <- function(input, output) {
          summarize(Team, `Hitting Percentage`) %>% 
          slice(1:10)
      }
+)
      
-     else(if(input$Category == "Kills"){
+      output$table7 <- renderTable({
        T_K %>% 
          filter(year == input$Year) %>%
          mutate(`Kills per Set` = `Per Set`) %>% 
          summarize(Team, `Kills per Set`) %>% 
          slice(1:10)
-     }
+      }
+      )
      
-     else(if(input$Category == "Service Aces"){
+      output$table8 <- renderTable({
        T_SA %>% 
-         mutate(`Per Set` == round(Aces/S, 2)) %>% 
+         mutate(`Service Aces per Set` = round(Aces/S, 2)) %>% 
          filter(year == input$Year) %>%
-         mutate(`Service Aces per Set` = `Per Set`) %>% 
          summarize(Team, `Service Aces per Set`) %>% 
          slice(1:10)
      }
-     
-     else(if(input$Category == "Win Rate"){
+      )
+      
+     output$table9 <- renderTable({
        T_WR %>% 
          filter(year == input$Year) %>%
          
@@ -443,8 +543,7 @@ server <- function(input, output) {
          summarize(Team, `Win Rate`) %>% 
          slice(1:10)
      }
-     
-      else(
+     )
         
 # Last else statement that leads me to the Opponent Hitting Percentage, 
 # which measures how good the ranked team's opponents were at 
@@ -452,17 +551,125 @@ server <- function(input, output) {
 # the tougher the opponents, and the higher ranked were the teams.
       
         
-        if(input$Category == "Opponent Hitting Percentage"){
+        output$table10 <- renderTable({
         T_OHP %>%  
         filter(year == input$Year) %>%
-        rename(`Percentage` = pct(`Opp Pct` * 100)) %>% 
-        summarize(Team, Percentage) %>% 
+        mutate(`Opp Hitting Percentage` = pct(`Opp Pct` * 100)) %>% 
+        summarize(Team, `Opp Hitting Percentage`) %>% 
         slice(1:10)
         }
-      
-     ))))))))))
+     )
     
-      
-}
+     output$table11 <- renderTable({
+       only_text(T_A) %>% 
+             filter(year == input$Year2) %>%
+             group_by(conference) %>% 
+             mutate(`Aces per Set` = `Per Set`) %>% 
+             summarize(mean(`Aces per Set`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+     )
+         output$table12 <- renderTable({
+           only_text(T_Ast) %>% 
+             filter(year == input$Year2) %>%
+             mutate(`Assists per Set` = `Per Set`) %>% 
+             group_by(conference) %>% 
+             summarize(mean(`Assists per Set`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+         )
+         
+        output$table13 <- renderTable({
+           only_text(T_Att) %>% 
+             filter(year == input$Year2) %>%
+             mutate(`Attacks per Set` = `Per Set`) %>% 
+             group_by(conference) %>% 
+             summarize(mean(`Attacks per Set`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+        )
+        
+         output$table14 <- renderTable({
+           only_text(T_B) %>% 
+             filter(year == input$Year2) %>%
+             mutate(`Blocks per Set` = `Per Set`) %>% 
+             group_by(conference) %>% 
+             summarize(mean(`Blocks per Set`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+         )
+         
+         output$table15 <- renderTable({
+           only_text(T_D) %>% 
+             filter(year == input$Year2) %>%
+             mutate(`Digs per Set` = `Per Set`) %>%
+             group_by(conference) %>% 
+             summarize(mean(`Digs per Set`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+         )
+         
+         output$table16 <- renderTable({
+           only_text(T_HP) %>% 
+             filter(year == input$Year2) %>% 
+             group_by(conference) %>% 
+             summarize(mean(`Pct.`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+         )
+         
+         output$table17 <- renderTable({
+           only_text(T_K)%>% 
+             filter(year == input$Year2) %>%
+             mutate(`Kills per Set` = `Per Set`) %>% 
+             group_by(conference) %>% 
+             summarize(mean(`Kills per Set`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+         )
+         
+         output$table18 <- renderTable({
+           only_text(T_SA) %>% 
+             mutate(`Service Aces per Set` = round(Aces/S, 2)) %>%
+             filter(year == input$Year2) %>%
+             group_by(conference) %>% 
+             summarize(mean(`Service Aces per Set`), .groups = "drop") %>% 
+             slice(1:10)
+         }
+         )
+         
+         output$table19 <- renderTable({
+           only_text(T_WR) %>% 
+             filter(year == input$Year2) %>%
+             group_by(conference) %>%  
+             summarize(mean(`Pct.`), .groups = "drop")%>% 
+             slice(10)
+         }
+         )
+         
+        
+           
+           
+           output$table20 <- renderTable({
+             only_text(T_OHP) %>%  
+               filter(year == input$Year2) %>%
+               mutate(`Opp Hitting Percentage` = pct(`Opp Pct` * 100)) %>% 
+               group_by(conference) %>% 
+               summarize(mean(`Opp Hitting Percentage`), .groups = "drop")%>% 
+               slice(1:10)
+           })
+ 
+
+     output$regression1 <- renderPlot(
+       {
+        ggplotRegression(lm(Pts ~ Kills, I_Pts) )
+       }
+     )
+     output$regression2 <- renderPlot(
+       {
+         ggplotRegression(lm(Pts ~ Pos, I_Pts))
+       }
+     )
+     }
 
 shinyApp(ui = ui, server = server)
