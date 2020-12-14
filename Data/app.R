@@ -50,6 +50,7 @@ I_SA <- read_rds("raw_data/Individual SA.rds")
 I_HP <- read_rds("raw_data/Individual Ht Pct.rds")
 
 # read in win rate for the word cloud
+# unsuccessful attempt to create a word cloud
 
 # Digs <- read_rds("raw_data/Digs.rds")
 
@@ -276,8 +277,14 @@ ui <- navbarPage(#tags$head(
                       sidebarPanel(width = 2,
                         selectInput(inputId = "Year2",
                                     label = "Year:",
-                                    choices = c(2011:2019))#,
-                      #selectInput("Category2",
+                                    choices = c(2011:2019))
+                        
+# I have decided to change the dropdown menu such that
+# the displayed graphics look like the graphs from the players' tab
+# and have all skill categories displayed at once for every year rather
+# than displaying every category one by one.
+
+                      # selectInput("Category2",
                                  # "Category:",
                                  # c("Aces",
                                  #   "Assists",
