@@ -145,6 +145,8 @@ ui <- navbarPage(#tags$head(
 # The images in html won't load properly on shinyapp, so I removed
 # the images as well. I will try to add them back in later, but
 # the images for the About page are not a top priority at the moment.
+# Final update on the images: they kept crashing the about page so I decided
+# to drop them. Sad!
 
       includeCSS("www/main.css",
                  "www/fontawesome-all.min.css"),
@@ -227,7 +229,12 @@ ui <- navbarPage(#tags$head(
                sidebarPanel(width = 2,
                  selectInput(inputId = "Year",
                              label = "Year:",
-                             choices = c(2011:2019))#,
+                             choices = c(2011:2019))
+                 
+# No longer using category as an interactive component of the model here, and 
+# instead choosing to display the categories for every year all at once. 
+
+                 #,
             # selectInput("Category",
                         # "Category:",
                         # c("Aces",
@@ -244,6 +251,7 @@ ui <- navbarPage(#tags$head(
                          #)
                          #)
                           ),
+
                 mainPanel(h4("Top 10 Teams per Category", align = "center"),
                           fluidRow(
                             
@@ -323,53 +331,62 @@ ui <- navbarPage(#tags$head(
              ))
              ,
                  
-                 # wordcloud showing frequency of each team to be
-                 # ranked, per skill set -> a wordcloud for 
-                 # every category
-                 # Potentially a measurement of popularity??
-                 # do both first
-                 
     tabPanel("Model", 
+             
+# Dividing the panel into two separate sub panels, one displaying a model for
+# individual players and the other displaying a model for team/conference stats.
+
              tabsetPanel(
              tabPanel(
                "Individual Players",
-               h2("Regression Model 1", align = "center"),
+               
+               h2("Regression Model", align = "center"),
+               
               plotOutput("regression1"),
+              
               p("This model is a linear regression between the total number of points 
-                scored by top players and the total number of kills they scored."),
+                scored by top players and the total number of kills they scored.",
+                align = "center"),
+              
               p("Based on the regression line, we can assume that there is a 
-                positive relationship between kills and overall points scored."),
-             # first regression: class year vs performance 
-             # per skill set
-             # second regression: performance over time per
-             # skill set based on region/conference/school
-             h2("Regression Model 2", align = "center"),
-             plotOutput("regression2")
+                positive relationship between kills and overall points scored.",
+                align = "center"),
+              
+              p("Based on the Adjusted R2 value we can see that not only
+                is there a positive correlation, the model is also very 
+                well-fit.", align = "center")
              ),
+             
              tabPanel(
                "Teams",
-               h2("Regression Model 1", align = "center"),
-               plotOutput("regression"),
-              # p("")
-               h2("Regression Model 2", align = "center"),
-               plotOutput("regression3")
-               # potentially a regression on W-L rates ,
-               # likelihood of each school that was ranked to
-               # be ranked again (choose top 25 schools?)
-               # regression of performance over time per skill
-               # set based on regions, potentially divided into
-               # within each conference, and then national 
-               # rankings
+               
+               h2("Regression Model", align = "center"),
+               
+               plotOutput("regression2"),
+       
+               p("This model is a linear regression between the hitting 
+                 percentage of a team and the total number of kills scored
+                 by a team during that season.",
+                 align = "center"),
+               
+# Choosing for the text to be aligned in the center just because I think it 
+# looks better that way.
+
+               p("Based on the line, we can see that there is some positive 
+                 correlation between the hitting percentage and total kills. 
+                 However, the Adjusted R2 value reveals to us that the 
+                 fit of the model is not very accurate and the correlation
+                 is not very strong.", 
+                 align = "center")
              )
              ))
     )
 
 
-
-# regression models
-
-#fit_1 <- lm(Aces ~ Cl + Pos,
-            #I_A)
+# A function for creating the linear regression models, including the labels
+# that display useful information such as the adjusted R2 value that can 
+# show us how well-fitted the model is or isn't, also the strength of the 
+# correlation. 
 
 ggplotRegression <- function (fit) {
   
@@ -598,7 +615,7 @@ server <- function(input, output) {
      }
      )
         
-# Last else statement that leads me to the Opponent Hitting Percentage, 
+# Last table leads me to the Opponent Hitting Percentage, 
 # which measures how good the ranked team's opponents were at 
 # scoring on average. The higher the opp hp,
 # the tougher the opponents, and the higher ranked were the teams.
@@ -612,7 +629,12 @@ server <- function(input, output) {
         slice(1:10)
         }
      )
-    
+ 
+# Here are tables for the conference rankings,
+# where the average performance for each conference (
+# counted by the the average of the performances of the 
+# schools in each conference) is displayed.
+
      output$table11 <- renderTable({
        only_text(T_A) %>% 
              filter(year == input$Year2) %>%
@@ -635,6 +657,12 @@ server <- function(input, output) {
         output$table13 <- renderTable({
            only_text(T_Att) %>% 
              filter(year == input$Year2) %>%
+            
+# There is a separate input ID for year despite the options being the
+# same, because originally when there was only one input id for year, the year
+# displayed for the conference rankings would be the same as the teams' selected
+# year, and the drop down menu in the conference tab was useless.
+            
              mutate(`Attacks per Set` = `Per Set`) %>% 
              group_by(conference) %>% 
              summarize(mean(`Attacks per Set`), .groups = "drop") %>% 
@@ -707,35 +735,41 @@ server <- function(input, output) {
              only_text(T_OHP) %>%  
                filter(year == input$Year2) %>%
                mutate(`Opp Hitting Percentage` = pct(`Opp Pct` * 100)) %>% 
+               
+# I also have to convert the data for Opponent Hitting Pct and team Hitting
+# Pct into percentages rather than the decimals in the columns.
+               
                group_by(conference) %>% 
                summarize(mean(`Opp Hitting Percentage`), .groups = "drop")%>% 
                slice(1:10)
            })
  
-
+# A simple linear regression plot for the stat model, which models the 
+# relationship between the total number of points scored by a player in 
+# one season and the number of kills (any time an attack is not returned
+# by the opponent) a player has scored in one season.
+           
      output$regression1 <- renderPlot(
        {
+         
+# Using the regression function made above! 
+         
         ggplotRegression(lm(Pts ~ Kills, I_Pts) )
        }
      )
-     output$regression2 <- renderPlot(
-       {
-         ggplotRegression(lm(Pts ~ Pos, I_Pts))
-       }
-     )
+    
+# A linear regression model for the relationship between a team's Hitting
+# Pct (Total Kills - Total Errors divided by total number of attempts) for
+# each season and the total number of kills by a team in each season.
      
-     output$regression <- renderPlot(
+     output$regression2 <- renderPlot(
        {
         
          ggplotRegression(lm(`Pct.` ~ Kills, T_HP))
        }
      )
      
-     output$regression3 <- renderPlot(
-       {
-         ggplotRegression(lm(`Pct.` ~ Errors, T_HP))
-       }
-     )
+
      }
 
 shinyApp(ui = ui, server = server)
